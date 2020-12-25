@@ -3,7 +3,6 @@ package com.weiwei.zll.bootredis.service;
 import com.alibaba.fastjson.JSON;
 import java.nio.charset.Charset;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -156,12 +155,10 @@ public class RedisCacheService {
      */
     public boolean tryLock(String lockKey, String requestId, long expire) {
         try {
-            RedisCallback<Boolean> callback = (connection) -> {
-                return connection
-                        .set(lockKey.getBytes(Charset.forName("UTF-8")), requestId.getBytes(Charset.forName("UTF-8")),
-                                Expiration.seconds(TimeUnit.MILLISECONDS.toSeconds(expire)),
-                                RedisStringCommands.SetOption.SET_IF_ABSENT);
-            };
+            RedisCallback<Boolean> callback = (connection) -> connection
+                    .set(lockKey.getBytes(Charset.forName("UTF-8")), requestId.getBytes(Charset.forName("UTF-8")),
+                            Expiration.seconds(TimeUnit.MILLISECONDS.toSeconds(expire)),
+                            RedisStringCommands.SetOption.SET_IF_ABSENT);
             return redisTemplate.execute(callback);
         } catch (Exception e) {
             log.error("redis lock error.", e);
@@ -175,12 +172,10 @@ public class RedisCacheService {
      * @param requestId 唯一ID
      */
     public boolean releaseLock(String lockKey, String requestId) {
-        RedisCallback<Boolean> callback = (connection) -> {
-            return connection
-                    .eval(UNLOCK_LUA.getBytes(), ReturnType.BOOLEAN, 1, lockKey.getBytes(Charset.forName("UTF-8")),
-                            requestId.getBytes(Charset.forName("UTF-8")));
-        };
-        return (Boolean) redisTemplate.execute(callback);
+        RedisCallback<Boolean> callback = (connection) -> connection
+                .eval(UNLOCK_LUA.getBytes(), ReturnType.BOOLEAN, 1, lockKey.getBytes(Charset.forName("UTF-8")),
+                        requestId.getBytes(Charset.forName("UTF-8")));
+        return redisTemplate.execute(callback);
     }
 
     /**
@@ -188,10 +183,8 @@ public class RedisCacheService {
      */
     public String get(String lockKey) {
         try {
-            RedisCallback<String> callback = (connection) -> {
-                return new String(connection.get(lockKey.getBytes()), Charset.forName("UTF-8"));
-            };
-            return (String) redisTemplate.execute(callback);
+            RedisCallback<String> callback = (connection) -> new String(connection.get(lockKey.getBytes()), Charset.forName("UTF-8"));
+            return redisTemplate.execute(callback);
         } catch (Exception e) {
             log.error("get redis occurred an exception", e);
         }
