@@ -147,7 +147,7 @@ public class RedisCacheService {
     }
 
     /**
-     * 获取分布式锁，原子操作
+     * 获取分布式锁，原子操作(指定超时时间)
      *
      * @param lockKey key
      * @param requestId 唯一ID, 可以使用UUID.randomUUID().toString();

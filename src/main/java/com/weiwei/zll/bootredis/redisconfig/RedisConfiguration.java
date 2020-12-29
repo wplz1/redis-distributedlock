@@ -56,7 +56,7 @@ public class RedisConfiguration {
         source.put("spring.redis.cluster.nodes", StringUtils.join(redisProperties.getCluster().getNodes(), ","));
         RedisClusterConfiguration redisClusterConfiguration;
         redisClusterConfiguration = new RedisClusterConfiguration(new MapPropertySource("RedisClusterConfiguration", source));
-        //redisClusterConfiguration.setPassword(AESUtil.decryptAES(redisProperties.getPassword(), ImConstants.AES_KEY));
+        //redisClusterConfiguration.setPassword(AESUtil.decryptAES(redisProperties.getPassword(), Constants.AES_KEY));
         return redisClusterConfiguration;
 
     }
